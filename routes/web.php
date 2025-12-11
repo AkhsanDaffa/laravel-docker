@@ -1,21 +1,39 @@
 <?php
 
-use App\Models\User;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
 
 Route::get('/', function () {
-    return view('welcome');
+    // 1. Cek Koneksi Database
+    try {
+        DB::connection()->getPdo();
+        $db_status = "Connected 🟢";
+        $db_name = DB::connection()->getDatabaseName();
+    } catch (\Exception $e) {
+        $db_status = "Error 🔴";
+        $db_name = "-";
+    }
+
+    // 2. Kirim data ke tampilan (View)
+    return view('welcome', [
+        'db_status' => $db_status,
+        'db_name' => $db_name,
+        'server_ip' => $_SERVER['SERVER_ADDR'] ?? '127.0.0.1',
+        'software' => $_SERVER['SERVER_SOFTWARE'] ?? 'Nginx/Docker',
+        'php_version' => phpversion()
+    ]);
 });
 
+// Route pemicu input data (yang tadi kita buat)
 Route::get('/test-input', function () {
     try {
-        User::create([
-            'name' => 'Daffa DevOps',
-            'email' => 'Daffa@devops.com',
-            'password' => Hash::make('rahasia123'),
+        \App\Models\User::create([
+            'name' => 'Teman Pamer ' . rand(1,100),
+            'email' => 'teman'.rand(1,1000).'@pamer.com',
+            'password' => \Illuminate\Support\Facades\Hash::make('rahasia'),
         ]);
-        return "<h1>✅ SUKSES! Data 'Daffa DevOps' berhasil masuk ke Database.</h1>";
+        return redirect('/')->with('success', 'User Baru Berhasil Dibuat!');
     } catch (\Exception $e) {
-        return "<h1>❌ GAGAL: " . $e->getMessage() . "</h1>";
+        return redirect('/')->with('error', 'Gagal buat user: ' . $e->getMessage());
     }
 });
