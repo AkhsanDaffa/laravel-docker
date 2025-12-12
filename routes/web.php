@@ -36,4 +36,4 @@ Route::get('/test-input', function () {
     } catch (\Exception $e) {
         return redirect('/')->with('error', 'Gagal buat user: ' . $e->getMessage());
     }
-});
+})->middleware('throttle:5,1');
