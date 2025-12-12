@@ -18,7 +18,8 @@ Route::get('/', function () {
     return view('welcome', [
         'db_status' => $db_status,
         'db_name' => $db_name,
-        'server_ip' => $_SERVER['SERVER_ADDR'] ?? '127.0.0.1',
+        // 'server_ip' => $_SERVER['SERVER_ADDR'] ?? '127.0.0.1',
+        'server_ip' => request()->ip(),
         'software' => $_SERVER['SERVER_SOFTWARE'] ?? 'Nginx/Docker',
         'php_version' => phpversion()
     ]);
